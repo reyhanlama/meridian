@@ -1,220 +1,219 @@
-# Meridian — Planner Report
-_Last updated: 2026-02-28_
+# Meridian — Mobile-First Plan
+_Last updated: 2026-02-28 · Strategy: PWA (Progressive Web App)_
 
 ---
 
-## Bugs Found (Real Issues in the Current Code)
+## Strategy
 
-### B1 — Pin ID collision on remove + re-add `Globe.tsx`
-The touch handler uses `currentPins.length + 1` to assign a new pin ID, but the
-mouse handler uses `pinIdCounter.current`. If pins are removed and re-added via touch,
-IDs will collide with earlier pins. **Owner: Globe Agent**
+Meridian will be a **Progressive Web App (PWA)** — mobile-first, installable on iOS and
+Android home screens, with a native-like feel. No React Native rewrite needed. The existing
+React + Canvas + Web Audio stack works well on mobile browsers. The goal is:
 
-### B2 — Unreachable keys in `REGION_SCALE_MAP` `AudioEngine.ts`
-The following keys are mapped in the audio engine but are never returned by
-`getMusicalRegion()` in `countryData.ts` — they are dead code:
-- `"Japan"` → `countryData` returns `"East Asia"` (same scale, but the key is wasted)
-- `"Latin America"` → `countryData` returns `"South America"` or `"Central America"`
-- `"Scandinavia"` → `countryData` returns `"Northern Europe"`
-- `"Mediterranean"` → `countryData` returns `"Southern Europe"`
-
-**Owner: Audio Agent** (clean up the map, verify scale assignments)
-
-### B3 — `getContinent("Japan")` returns `"the unknown"` `storyGenerator.ts`
-`getContinent` checks `r.includes("asia")` but the musical region for Japan is
-`"East Asia"` which does contain "asia" — BUT when a pin's `musicalRegion` is directly
-`"Japan"` (it shouldn't be, but defensive check needed), it would fall through.
-More importantly: "Oceania" passes through correctly, but several compound strings
-like "Central America" may match the wrong branch.
-**Owner: Story Agent** (audit all continent checks)
-
-### B4 — Touch scrubbing missing in Player `Player.tsx`
-The progress bar only has mouse event handlers. On mobile, the seeker cannot be
-dragged. The bar is fully non-functional on touch devices.
-**Owner: UI Agent**
-
-### B5 — City snap radius too small for most clicks `Globe.tsx`
-`MAX_CITY_DIST_RAD = 1.5° (~165 km)` and is only applied when NO country polygon
-is matched. Clicking anywhere inside a country polygon that has a nearby city will
-NOT get a city label — only if you click on a tiny island with no polygon.
-Most clicks on large countries (USA, Russia, China) show the country name only,
-never a city, even if you click right on top of one.
-**Owner: Globe Agent** (expand city snapping to within-polygon clicks too)
+- Works beautifully at 390px (iPhone 15) up to tablet (768px+)
+- Installable via "Add to Home Screen" on iOS Safari and Chrome Android
+- Touch-first interactions — no reliance on hover, mouse, or keyboard
+- Feels like a native music app, not a website
 
 ---
 
-## Improvements (Existing Features That Need Work)
+## Current Mobile Audit — What's Broken Right Now
 
-### I1 — Compose button logic is duplicated `App.tsx`
-There are two separate `AnimatePresence` blocks for the Compose button:
-one for 3–7 pins and another for exactly 8. Same action, different styling.
-Should be a single conditional block.
+### 🔴 M0 — Waveform canvas overflows on iPhone
+`Player.tsx` hardcodes `canvas width = 400px`. iPhone 15 CSS viewport = 390px.
+The canvas clips 10px off the right edge. Breaks on every modern iPhone.
 **Owner: UI Agent**
 
-### I2 — No way to skip the Interstitial `Interstitial.tsx`
-The loading animation plays for ~12–14 seconds and cannot be skipped. Returning
-users who re-compose will sit through the whole sequence again.
-**Owner: UI Agent** (add a subtle "skip" or click-anywhere-to-skip)
-
-### I3 — Globe auto-rotate resumes even mid-hover `Globe.tsx`
-After 5 seconds of no dragging, auto-rotate resumes even if the user is still
-hovering over the globe. Should only resume if the mouse has left the globe.
-**Owner: Globe Agent**
-
-### I4 — Composition duration is hardcoded `AudioEngine.ts`
-`readonly duration: number = 80` — there is no way to change this. A 60/90/120s
-option would let users get a longer piece for more pins.
-**Owner: Audio Agent**
-
-### I5 — Progress bar and waveform are fixed pixel widths `Player.tsx`
-Waveform canvas: `400×120px`. Progress bar: `300px`. Both are hardcoded pixel
-values. On mobile these are fine, but on wide screens they look undersized.
-**Owner: UI Agent** (make both scale with viewport width, capped at ~600px)
-
-### I6 — Album epigraphs are too few `albumTitle.ts`
-Only 10 epigraph strings for potentially hundreds of unique compositions.
-Frequent users will see repeats immediately.
-**Owner: Story Agent** (expand to 30+)
-
-### I7 — Story templates repeat quickly `storyGenerator.ts`
-6 strings per slot × 6 slots = narrow variety. Heavy users will see the same
-lines within a few compositions.
-**Owner: Story Agent** (expand each slot to 12–15 options)
-
-### I8 — No country highlight on hover `Globe.tsx`
-The tooltip shows the country name, but the country polygon itself has no
-visual response on hover (fill change, border highlight). The globe feels
-unresponsive to mouse movement.
-**Owner: Globe Agent**
-
-### I9 — `getRegionLabel()` shows scale name, not region name `AudioEngine.ts`
-In the Player and Tracklist, each pin shows its scale (e.g. "Pentatonic Major")
-instead of its musical region (e.g. "West Africa"). The scale name is less
-meaningful to users.
-**Owner: Audio Agent / UI Agent** (export a `getRegionName()` helper and swap)
-
-### I10 — No visual indication that clicking at max pins does nothing `Globe.tsx`
-When 8 pins are placed, clicking the globe silently does nothing. No cursor
-change, no feedback. User might think the app is broken.
-**Owner: Globe Agent** (change cursor to `not-allowed` at max, or show a flash)
-
-### I11 — Tracklist remove affordance is unclear `Tracklist.tsx`
-The `×` only appears on hover via `opacity-0 group-hover:opacity-100`. On mobile
-(no hover state), there is no visible indication that tapping a pill removes it.
-**Owner: UI Agent** (always show a small × on mobile, hide on desktop unless hovered)
-
-### I12 — No keyboard shortcuts anywhere
-Space/R/Escape/Backspace do nothing. This is a significant gap for desktop UX.
+### 🔴 M1 — No safe area insets — content behind notch & home bar
+`index.html` viewport meta is missing `viewport-fit=cover`.
+No component uses `env(safe-area-inset-*)`.
+On iPhone, the Tracklist bar (`fixed bottom-0`) sits behind the home indicator (34px).
+The Compose button (`fixed bottom-20`) may also be obscured.
 **Owner: UI Agent**
+
+### 🔴 M2 — Touch scrubbing completely missing in Player
+The progress bar has zero touch event handlers. On mobile, the seeker cannot
+be dragged at all. This is the primary playback control.
+**Owner: UI Agent**
+
+### 🔴 M3 — No PWA metadata in index.html
+Missing: `viewport-fit=cover`, `theme-color`, `apple-mobile-web-app-capable`,
+`apple-mobile-web-app-status-bar-style`, and a link to a web manifest.
+Without these, "Add to Home Screen" shows a plain webpage, not an app.
+**Owner: UI Agent**
+
+### 🟠 M4 — Hover-only affordances break on mobile
+Multiple components rely on `onMouseEnter/onMouseLeave` for visual feedback that
+never fires on touch devices:
+- Tracklist `×` remove indicator: `opacity-0 group-hover:opacity-100` → never visible on mobile
+- All button hover colour changes (Compose, Clear, Player buttons)
+- Globe country tooltip only shows on mouse move
+**Owner: UI Agent + Globe Agent**
+
+### 🟠 M5 — Touch targets too small
+Many interactive elements are under 44×44px (Apple HIG minimum):
+- Tracklist pills: `py-1.5` = ~28px tall
+- Header pin dots: 4px dots (not interactive, but visually cramped)
+- Player pin dots: `w-10 h-10 → w-12 h-12` range but labels are tiny
+- Interstitial has no skip affordance at all
+**Owner: UI Agent**
+
+### 🟠 M6 — White flash on iOS before app paints
+`theme.css` `:root` sets `--background: #ffffff` (light mode default).
+The app immediately overrides with `background-color: #070a0f` inline, but
+there's a visible white flash on iOS during initial paint.
+**Owner: UI Agent** (set `<meta name="theme-color">` + CSS body background)
+
+### 🟠 M7 — StarField is 120 Motion-animated DOM nodes
+120 `<motion.div>` elements each running an infinite opacity animation.
+On low-end Android this will cause jank during globe interaction.
+**Owner: UI Agent** (move to a single Canvas or reduce to 60 nodes)
 
 ---
 
-## New Features (Interesting Additions)
+## Mobile-First Layout Vision
 
-### F1 — URL Share / Deep Linking ⭐ HIGH VALUE
-Encode pins into the URL hash: `#v1;lat,lng;lat,lng;...`
-- Any composition becomes a shareable link
-- Globe restores pins on load from hash
-- "Copy link" button appears in the Player view
-- Works entirely client-side, zero infrastructure needed
-**Owner: Share Agent**
+### Globe Phase (portrait phone)
+```
+┌────────────────────────┐  ← status bar (safe area top)
+│ Meridian    3/8  Clear │  ← Header: compact, ~52px, left/right padding safe
+├────────────────────────┤
+│                        │
+│                        │
+│         GLOBE          │  ← fills remaining height
+│      (full width)      │
+│                        │
+│                        │
+│    ▶ Compose Track     │  ← floating button, above tracklist
+├────────────────────────┤
+│ 📍Tokyo → 📍London → … │  ← Tracklist, scrollable, ~60px
+└────────────────────────┘  ← home indicator (safe area bottom)
+```
 
-### F2 — Preset Journeys / Curated Routes ⭐ HIGH VALUE
-A small panel or button that offers famous multi-pin routes:
-- "Silk Road" (7 pins: Rome → Istanbul → Tehran → Samarkand → Delhi → Xi'an → Beijing)
-- "Trans-Atlantic" (4 pins: New York → Lisbon → Dakar → Rio)
-- "Pacific Ring" (6 pins: Tokyo → Manila → Sydney → Auckland → Honolulu → Vancouver)
-- "Random Route" — drops 5 random pins
-Great for onboarding, shows the app's range immediately.
-**Owner: Globe Agent + UI Agent**
-
-### F3 — Search / Fly-to Location ⭐ HIGH VALUE
-A small search input in the header: type a city or country name, globe animates
-(rotates and "flies") to face that location, then user clicks to drop the pin.
-**Owner: Globe Agent + UI Agent**
-
-### F4 — Loop Mode + Composition Duration Picker
-A toggle in the Player for loop, and a duration selector (60 / 90 / 120s)
-shown before composing (in the Header or as a settings panel).
-**Owner: Audio Agent + UI Agent**
-
-### F5 — Waveform + Route Card Export (Share as Image)
-A "Share Image" button in the Player that generates a PNG:
-- Black background with the route on a mini globe
-- Album title, pin cities, waveform snapshot
-- Downloadable and shareable to social media
-**Owner: UI Agent + Globe Agent** (mini globe render)
-
-### F6 — Composition History (LocalStorage Gallery)
-After composing, save the pin set + album meta to LocalStorage.
-A small "History" icon in the header opens a drawer showing past compositions.
-Click any to restore the pins and re-compose.
-**Owner: Share Agent + UI Agent**
-
-### F7 — Night-Side Globe Shading
-The globe currently renders uniformly. Add a directional light source:
-the far hemisphere gets a subtle darkening gradient, giving depth and realism.
-Also improves the feeling of the globe as a 3D object.
-**Owner: Globe Agent**
-
-### F8 — Country Hover Highlight (filled polygon)
-When hovering, fill the hovered country polygon with a very subtle tinted color
-(e.g. `rgba(255,255,255,0.06)` → `rgba(255,255,255,0.12)` on hover).
-**Owner: Globe Agent** (tracked as I8 above — elevating to feature if complex)
-
-### F9 — Pin Drag Reordering in Tracklist
-Drag a pill in the Tracklist to reorder it. This changes:
-- The order of connecting arcs on the globe
-- The story narrative (start/end cities change)
-- The composition (layer sequencing)
-**Owner: UI Agent**
-
-### F10 — AI-Generated Story Mode (Claude API, opt-in)
-An optional "AI Story" mode where the interstitial text is generated by Claude
-using the actual cities, regions, and scales as context. Falls back silently
-to the local generator if no API key is provided.
-**Owner: Story Agent**
-
-### F11 — Optional Rhythm Layer
-A toggle before composing: "Add pulse" — adds a slow organic rhythm layer
-(not a beat, more like breathing-in-time). This is a new layer in the AudioEngine
-on top of the existing 6.
-**Owner: Audio Agent**
-
-### F12 — Atmosphere Visualisation on Globe
-While in map phase, softly color the globe ocean or land by the detected
-atmosphere type of the current pin set as it evolves (arctic = cool blue tint,
-tropical = warm amber, oceanic = deep teal).
-**Owner: Globe Agent**
+### Player Phase (portrait phone)
+```
+┌────────────────────────┐  ← safe area top
+│                        │
+│  3 Points · 2 Regions  │  ← eyebrow
+│                        │
+│   "Distant Echoes"     │  ← title (large, italic)
+│   from the deep…       │  ← epigraph
+│                        │
+│  ▁▂▄▆▄▂▁▂▄▆▄▂▁▂▄▆    │  ← waveform: 100% width − padding
+│                        │
+│  0:24 ━━━━●━━━━━━━ 1:20│  ← scrubber: 100% width
+│                        │
+│  ⬤→⬤→⬤→⬤            │  ← pin dots, wrap on small screens
+│                        │
+│  ▶ Play   ↓   New     │  ← buttons: full-width row
+│  ↑ Share (Web Share)   │
+└────────────────────────┘  ← safe area bottom
+```
 
 ---
 
-## Priority Order
+## Revised Priority List (Mobile-First)
 
-| Priority | ID  | Description                        | Agent(s)         | Effort |
-|----------|-----|------------------------------------|------------------|--------|
-| 🔴 P1   | B5  | City snapping inside polygons      | Globe            | Small  |
-| 🔴 P1   | B1  | Pin ID collision on touch          | Globe            | Small  |
-| 🔴 P1   | B4  | Touch scrubbing in Player          | UI               | Small  |
-| 🔴 P1   | B2  | Dead keys in REGION_SCALE_MAP      | Audio            | Small  |
-| 🟠 P2   | I8  | Country hover highlight            | Globe            | Medium |
-| 🟠 P2   | I3  | Auto-rotate resumes on hover       | Globe            | Small  |
-| 🟠 P2   | I10 | Max pins cursor/feedback           | Globe            | Small  |
-| 🟠 P2   | I12 | Keyboard shortcuts                 | UI               | Small  |
-| 🟠 P2   | I2  | Skip interstitial                  | UI               | Small  |
-| 🟠 P2   | I5  | Responsive waveform/progress bar   | UI               | Small  |
-| 🟠 P2   | I9  | Show region name not scale name    | Audio + UI       | Small  |
-| 🟡 P3   | F1  | URL sharing                        | Share            | Medium |
-| 🟡 P3   | F7  | Night-side globe shading           | Globe            | Medium |
-| 🟡 P3   | F2  | Preset journeys                    | Globe + UI       | Medium |
-| 🟡 P3   | I7  | Expand story templates             | Story            | Small  |
-| 🟡 P3   | I6  | Expand epigraphs                   | Story            | Small  |
-| 🟡 P3   | I4  | Configurable composition duration  | Audio + UI       | Medium |
-| 🟢 P4   | F3  | Search / fly-to                    | Globe + UI       | Large  |
-| 🟢 P4   | F6  | Composition history                | Share + UI       | Large  |
-| 🟢 P4   | F9  | Tracklist drag-reorder             | UI               | Medium |
-| 🟢 P4   | F4  | Loop mode                          | Audio + UI       | Small  |
-| 🟢 P4   | F11 | Optional rhythm layer              | Audio            | Medium |
-| 🟢 P4   | F5  | Share as image                     | UI + Globe       | Large  |
-| 🔵 P5   | F10 | AI story mode (Claude)             | Story            | Large  |
-| 🔵 P5   | F12 | Atmosphere on globe                | Globe            | Large  |
+### P0 — Blockers (app is broken on mobile, do first)
+
+| ID  | Task                                      | Agent | Effort |
+|-----|-------------------------------------------|-------|--------|
+| M0  | Responsive waveform canvas (not 400px)    | UI    | Small  |
+| M1  | Safe area insets (notch + home bar)       | UI    | Small  |
+| M2  | Touch scrubbing in Player                 | UI    | Small  |
+| M3  | PWA meta tags in index.html               | UI    | Small  |
+| M6  | Fix white flash (theme-color + body bg)   | UI    | XSmall |
+
+### P1 — Core Mobile Experience
+
+| ID  | Task                                              | Agent       | Effort |
+|-----|---------------------------------------------------|-------------|--------|
+| P1a | Web App Manifest + app icons (PWA installability) | UI          | Medium |
+| P1b | Touch targets audit — all buttons min 44px tall   | UI          | Small  |
+| P1c | Always-visible remove × on Tracklist (no hover)  | UI          | Small  |
+| P1d | Replace all hover-only colour changes with active states | UI   | Small  |
+| P1e | Player layout: buttons stack vertically on mobile | UI          | Small  |
+| P1f | Web Share API — "Share" button uses navigator.share | Share     | Small  |
+| P1g | Haptic feedback on pin drop (navigator.vibrate)   | Globe       | XSmall |
+
+### P2 — Polish & Feel
+
+| ID  | Task                                              | Agent       | Effort |
+|-----|---------------------------------------------------|-------------|--------|
+| P2a | Optimise StarField — single canvas or 60 nodes    | UI          | Small  |
+| P2b | Pinch-to-zoom on globe                            | Globe       | Medium |
+| P2c | Interstitial skip — tap anywhere to skip          | UI          | Small  |
+| P2d | Globe country hover → touch equivalent (tap highlight) | Globe  | Medium |
+| P2e | Landscape mode layout (globe + tracklist side-by-side) | UI    | Medium |
+| P2f | Fix auto-rotate resuming while finger is on globe | Globe       | Small  |
+| P2g | Night-side globe shading (visual depth)           | Globe       | Medium |
+| P2h | Fix white flash theme mismatch in CSS             | UI          | Small  |
+
+### P3 — New Mobile Features
+
+| ID  | Task                                              | Agent       | Effort |
+|-----|---------------------------------------------------|-------------|--------|
+| P3a | URL deep linking — encode pins in hash, shareable link | Share  | Medium |
+| P3b | Preset routes — "Silk Road", "Pacific Ring", "Random" | Globe+UI | Medium |
+| P3c | Composition history (LocalStorage)                | Share+UI    | Large  |
+| P3d | Configurable duration (60 / 90 / 120s) — small selector | Audio+UI | Medium |
+
+### P4 — Desktop-side features (lower priority for mobile)
+
+| ID  | Task                                              | Agent       | Effort |
+|-----|---------------------------------------------------|-------------|--------|
+| P4a | Keyboard shortcuts (Space, R, Escape)             | UI          | Small  |
+| P4b | Search / fly-to location                          | Globe+UI    | Large  |
+| P4c | Share as image (canvas PNG card)                  | UI+Globe    | Large  |
+| P4d | AI story mode (Claude API)                        | Story       | Large  |
+
+### Bugs (carry over, still fix)
+
+| ID  | Task                                              | Agent       | Effort |
+|-----|---------------------------------------------------|-------------|--------|
+| B1  | Pin ID collision on touch remove + re-add         | Globe       | Small  |
+| B2  | Dead keys in REGION_SCALE_MAP                     | Audio       | Small  |
+| B3  | getContinent("Japan") → "the unknown"             | Story       | Small  |
+| B5  | City snap inside polygons (not just islands)      | Globe       | Small  |
+
+---
+
+## Suggested Sprint Order
+
+### Sprint 1 — "Make It Work on Mobile" (P0 + P1)
+All agents work in parallel on their P0/P1 items.
+Tester verifies on iPhone Safari simulation after each agent finishes.
+
+**UI Agent:**  M0 → M1 → M2 → M3 → M6 → P1a → P1b → P1c → P1d → P1e
+
+**Globe Agent:** B1 → B5 → P1g → P2f
+
+**Share Agent:** P1f (Web Share API)
+
+**Audio Agent:** B2
+
+**Story Agent:** B3
+
+### Sprint 2 — "Feel Native" (P2)
+UI, Globe work in parallel on polish items.
+P2a → P2b → P2c → P2d → P2e → P2g
+
+### Sprint 3 — "Mobile Features" (P3)
+Share Agent + UI Agent: P3a → P3b → P3c
+Audio + UI: P3d
+
+### Sprint 4 — "Desktop + Advanced" (P4)
+Lower priority — only after mobile experience is solid.
+
+---
+
+## What Each Agent Owns in This Mobile Plan
+
+| Agent  | Sprint 1 focus                                         |
+|--------|--------------------------------------------------------|
+| UI     | ALL P0 blockers + P1 layout/touch/PWA work             |
+| Globe  | Bug fixes B1/B5 + haptic + auto-rotate fix             |
+| Share  | Web Share API (navigator.share)                        |
+| Audio  | Dead key cleanup in REGION_SCALE_MAP                   |
+| Story  | getContinent bug fix                                   |
+| Tester | Verify each agent's output on mobile viewport          |
+| Planner| Coordinate, update this file after each sprint         |
