@@ -137,16 +137,25 @@ function decodeTopojson(topology: any): any {
 
 // --- Geographic point-in-polygon (ray-casting in geo space) ---
 function pointInPolygonGeo(lng: number, lat: number, ring: [number, number][]): boolean {
+  if (ring.length < 3) return false;
+  // Normalise relative to the ring's own first vertex, not the test point.
+  // Normalising per-vertex relative to the test point causes opposite-hemisphere
+  // polygons (e.g. Mexico when testing India) to wrap around and produce false hits.
+  const refLng = ring[0][0];
+  let testLng = lng;
+  if (testLng - refLng > 180) testLng -= 360;
+  else if (testLng - refLng < -180) testLng += 360;
+
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
     let xi = ring[i][0], yi = ring[i][1];
     let xj = ring[j][0], yj = ring[j][1];
-    // Normalize each vertex to within ±180° of the test longitude
-    if (xi - lng > 180) xi -= 360; else if (xi - lng < -180) xi += 360;
-    if (xj - lng > 180) xj -= 360; else if (xj - lng < -180) xj += 360;
-    // Ensure the edge itself is consistent (fixes normalization boundary discontinuity)
+    // Normalise each vertex to the ring's reference longitude
+    if (xi - refLng > 180) xi -= 360; else if (xi - refLng < -180) xi += 360;
+    if (xj - refLng > 180) xj -= 360; else if (xj - refLng < -180) xj += 360;
+    // Ensure the edge itself is consistent (handles antimeridian-crossing edges)
     if (xj - xi > 180) xj -= 360; else if (xj - xi < -180) xj += 360;
-    if ((yi > lat) !== (yj > lat) && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
+    if ((yi > lat) !== (yj > lat) && testLng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
       inside = !inside;
     }
   }
