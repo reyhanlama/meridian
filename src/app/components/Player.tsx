@@ -21,6 +21,8 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
   const [activeSection, setActiveSection] = useState(0);
   const animRef = useRef<number>(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const canvasSizeRef = useRef({ w: 320, h: 120 });
   const progressBarRef = useRef<HTMLDivElement>(null);
   const started = useRef(false);
   const draggingRef = useRef(false);
@@ -60,18 +62,25 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
     const ctx = canvas.getContext("2d")!;
 
     const dpr = window.devicePixelRatio || 1;
-    const w = 400;
-    const h = 120;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const setupCanvas = () => {
+      const containerWidth = canvasContainerRef.current?.getBoundingClientRect().width ?? 320;
+      const w = Math.max(280, Math.min(560, containerWidth));
+      canvasSizeRef.current = { w, h: 120 };
+      canvas.width = w * dpr;
+      canvas.height = 120 * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = "120px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    setupCanvas();
+    window.addEventListener("resize", setupCanvas);
 
     let running = true;
 
     const draw = () => {
       if (!running) return;
+      const { w, h } = canvasSizeRef.current;
 
       const analyser = audioEngine.getAnalyser();
       const bufferLength = analyser ? analyser.frequencyBinCount : 64;
@@ -135,6 +144,7 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
     return () => {
       running = false;
       cancelAnimationFrame(animRef.current);
+      window.removeEventListener("resize", setupCanvas);
     };
   }, [audioEngine, pins, sectionDuration]);
 
@@ -179,6 +189,35 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
   const handleBarMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     setHoverPct(pctFromClientX(e.clientX));
   }, [pctFromClientX]);
+
+  const handleBarTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0];
+    draggingRef.current = true;
+    setIsDragging(true);
+    const pct = pctFromClientX(touch.clientX);
+    setHoverPct(pct);
+    seekToClientX(touch.clientX);
+  }, [pctFromClientX, seekToClientX]);
+
+  const handleBarTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (!draggingRef.current) return;
+    const touch = e.touches[0];
+    const pct = pctFromClientX(touch.clientX);
+    setHoverPct(pct);
+    setProgress(pct);
+    audioEngine.seek(pct * audioEngine.duration);
+  }, [audioEngine, pctFromClientX]);
+
+  const handleBarTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.changedTouches[0];
+    draggingRef.current = false;
+    setIsDragging(false);
+    const pct = pctFromClientX(touch.clientX);
+    audioEngine.seek(pct * audioEngine.duration);
+    setProgress(pct);
+    setPlayerState("playing");
+  }, [audioEngine, pctFromClientX]);
 
   const handlePauseResume = useCallback(() => {
     audioEngine.togglePause();
@@ -229,7 +268,11 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
   return (
     <motion.div
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-6"
-      style={{ backgroundColor: "#070a0f" }}
+      style={{
+        backgroundColor: "#070a0f",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -285,17 +328,21 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
 
       {/* Live waveform */}
       <motion.div
-        className="mt-10"
+        className="mt-10 w-full"
+        style={{ maxWidth: 560 }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.6 }}
       >
-        <canvas ref={canvasRef} style={{ display: "block" }} />
+        <div ref={canvasContainerRef} style={{ width: "100%" }}>
+          <canvas ref={canvasRef} style={{ display: "block" }} />
+        </div>
       </motion.div>
 
       {/* Seekable progress bar */}
       <motion.div
-        className="mt-4 flex items-center gap-3"
+        className="mt-4 flex items-center gap-3 w-full"
+        style={{ maxWidth: 560 }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 0.6 }}
@@ -314,8 +361,11 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
           onMouseEnter={() => setIsHoveringBar(true)}
           onMouseLeave={() => { if (!isDragging) setIsHoveringBar(false); }}
           onMouseMove={handleBarMouseMove}
+          onTouchStart={handleBarTouchStart}
+          onTouchMove={handleBarTouchMove}
+          onTouchEnd={handleBarTouchEnd}
           style={{
-            width: 300,
+            flex: 1,
             height: 24,
             display: "flex",
             alignItems: "center",

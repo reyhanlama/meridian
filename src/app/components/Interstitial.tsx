@@ -91,7 +91,11 @@ export function Interstitial({ pins, audioEngine, onComplete }: InterstitialProp
   return (
     <motion.div
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-8"
-      style={{ backgroundColor: "#070a0f" }}
+      style={{
+        backgroundColor: "#070a0f",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: fadeOut ? 0 : 1 }}
       exit={{ opacity: 0 }}

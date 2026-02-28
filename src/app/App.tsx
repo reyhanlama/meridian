@@ -83,7 +83,8 @@ export default function App() {
           <AnimatePresence>
             {pins.length >= 3 && pins.length < MAX_PINS && (
               <motion.div
-                className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pointer-events-none"
+                className="fixed left-0 right-0 z-50 flex justify-center pointer-events-none"
+                style={{ bottom: "calc(80px + env(safe-area-inset-bottom))" }}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
@@ -126,7 +127,8 @@ export default function App() {
           <AnimatePresence>
             {pins.length === 0 && (
               <motion.div
-                className="fixed left-1/2 bottom-10 -translate-x-1/2 z-40 pointer-events-none text-center"
+                className="fixed left-1/2 -translate-x-1/2 z-40 pointer-events-none text-center"
+                style={{ bottom: "calc(40px + env(safe-area-inset-bottom))" }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -151,7 +153,8 @@ export default function App() {
           <AnimatePresence>
             {pins.length >= MAX_PINS && (
               <motion.div
-                className="fixed left-1/2 bottom-24 -translate-x-1/2 z-50 flex flex-col items-center gap-3"
+                className="fixed left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3"
+                style={{ bottom: "calc(96px + env(safe-area-inset-bottom))" }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
@@ -205,7 +208,8 @@ export default function App() {
           <AnimatePresence>
             {pins.length > 0 && pins.length < 3 && (
               <motion.div
-                className="fixed left-1/2 bottom-10 -translate-x-1/2 z-40 pointer-events-none text-center"
+                className="fixed left-1/2 -translate-x-1/2 z-40 pointer-events-none text-center"
+                style={{ bottom: "calc(40px + env(safe-area-inset-bottom))" }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
