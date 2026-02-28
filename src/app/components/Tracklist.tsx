@@ -13,6 +13,7 @@ export function Tracklist({ pins, onPinRemove }: TracklistProps) {
       className="fixed bottom-0 left-0 right-0 z-50 flex items-center gap-3 px-8 py-4"
       style={{
         background: "linear-gradient(to top, #070a0fee 0%, #070a0f88 60%, transparent 100%)",
+        paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
       }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

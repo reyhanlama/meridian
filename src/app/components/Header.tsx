@@ -13,7 +13,10 @@ export function Header({ pinCount, maxPins, onCompose, onClear }: HeaderProps) {
   return (
     <motion.header
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 sm:px-8 py-4 sm:py-5"
-      style={{ background: "linear-gradient(to bottom, #070a0fee 0%, #070a0f88 60%, transparent 100%)" }}
+      style={{
+        background: "linear-gradient(to bottom, #070a0fee 0%, #070a0f88 60%, transparent 100%)",
+        paddingTop: "calc(16px + env(safe-area-inset-top))",
+      }}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.5 }}
