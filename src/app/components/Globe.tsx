@@ -353,6 +353,22 @@ export function Globe({ pins, maxPins, onPinDrop, onPinRemove }: GlobeProps) {
         }
       }
 
+      // Night-side shading — light source upper-left, consistent with ocean gradient
+      const nightGrad = ctx.createRadialGradient(
+        cx - R * 0.25, cy - R * 0.25, R * 0.35,
+        cx + R * 0.15, cy + R * 0.15, R
+      );
+      nightGrad.addColorStop(0, "transparent");
+      nightGrad.addColorStop(0.55, "rgba(3,7,18,0.08)");
+      nightGrad.addColorStop(1, "rgba(3,7,18,0.72)");
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.fillStyle = nightGrad;
+      ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+      ctx.restore();
+
       // Connecting arcs
       for (let i = 1; i < pins.length; i++) {
         const prev = pins[i - 1];
