@@ -561,7 +561,7 @@ export function Globe({ pins, maxPins, onPinDrop, onPinRemove }: GlobeProps) {
     pulsesRef.current.push({ lng, lat, color, time: Date.now() });
 
     onPinDrop({
-      id: pins.length + 1,
+      id: 0, // assigned by App.tsx via pinIdCounter
       lng, lat,
       country: countryName,
       city: displayCity || countryName,
@@ -688,7 +688,7 @@ export function Globe({ pins, maxPins, onPinDrop, onPinRemove }: GlobeProps) {
       pulsesRef.current.push({ lng, lat, color, time: Date.now() });
 
       onPinDropRef.current({
-        id: currentPins.length + 1,
+        id: 0, // assigned by App.tsx via pinIdCounter
         lng, lat,
         country: countryName,
         city: displayCity || countryName,
