@@ -53,7 +53,9 @@ function unproject(
   const sinC = Math.sin(c), cosC = Math.cos(c);
   const lat = Math.asin(cosC * Math.sin(φ0) + (y * sinC * Math.cos(φ0)) / (ρ || 1));
   const lng = λ0 + Math.atan2(x * sinC, ρ * Math.cos(φ0) * cosC - y * Math.sin(φ0) * sinC);
-  return [lng / DEG, lat / DEG];
+  const lngDeg = lng / DEG;
+  const normalizedLng = ((lngDeg + 180) % 360 + 360) % 360 - 180;
+  return [normalizedLng, lat / DEG];
 }
 
 function geoDistanceDeg(lng1: number, lat1: number, lng2: number, lat2: number): number {

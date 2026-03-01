@@ -4,61 +4,61 @@ A full inventory of every city, country, ocean, and sea that Meridian recognises
 
 ---
 
-## Cities (257)
+## Cities (400)
 
-### North America (24)
-New York, Los Angeles, Chicago, Miami, San Francisco, Seattle, Nashville, New Orleans, Washington D.C., Honolulu, Las Vegas, Atlanta, Denver, Boston, Portland, Phoenix, Minneapolis, Detroit, Philadelphia, Austin, Toronto, Montreal, Calgary, Vancouver
+### North America (44)
+New York, Los Angeles, Chicago, Miami, San Francisco, Seattle, Nashville, New Orleans, Washington D.C., Honolulu, Las Vegas, Atlanta, Denver, Boston, Portland, Phoenix, Minneapolis, Detroit, Philadelphia, Austin, Houston, San Diego, San Antonio, Kansas City, Baltimore, Charlotte, Memphis, Salt Lake City, San Jose, Toronto, Montreal, Calgary, Vancouver, Ottawa, Edmonton, Quebec City, Winnipeg, Halifax, Victoria, Saskatoon, Regina, St. John's, Kelowna, Whitehorse
 
-### Mexico & Central America & Caribbean (15)
-Mexico City, Guadalajara, Monterrey, Havana, Santo Domingo, Port-au-Prince, San Juan, Port of Spain, Guatemala City, San José, Managua, Tegucigalpa, San Salvador, Panama City, Kingston
+### Mexico & Central America & Caribbean (20)
+Mexico City, Guadalajara, Monterrey, Tijuana, Cancún, Mérida, Puebla, Belize City, Havana, Santo Domingo, Port-au-Prince, San Juan, Port of Spain, Guatemala City, San José, Managua, Tegucigalda, San Salvador, Panama City, Kingston
 
-### South America (18)
-São Paulo, Rio de Janeiro, Salvador, Brasília, Manaus, Fortaleza, Recife, Buenos Aires, Córdoba, Bogotá, Medellín, Cali, Lima, Santiago, Quito, Guayaquil, Caracas, La Paz, Montevideo, Asunción
+### South America (29)
+São Paulo, Rio de Janeiro, Salvador, Brasília, Manaus, Fortaleza, Recife, Belo Horizonte, Curitiba, Porto Alegre, Belém, Buenos Aires, Córdoba, Bogotá, Medellín, Cali, Barranquilla, Cartagena, Lima, Santiago, Quito, Guayaquil, Caracas, Maracaibo, La Paz, Sucre, Montevideo, Asunción, Paramaribo, Georgetown
 
-### Western Europe (15)
-London, Paris, Berlin, Hamburg, Munich, Amsterdam, Brussels, Vienna, Zurich, Geneva, Dublin, Edinburgh, Manchester, Lyon, Marseille
+### Western Europe (25)
+London, Paris, Berlin, Hamburg, Munich, Frankfurt, Cologne, Amsterdam, Rotterdam, Antwerp, Brussels, Vienna, Zurich, Bern, Geneva, Dublin, Edinburgh, Manchester, Birmingham, Glasgow, Lyon, Bordeaux, Strasbourg, Nice, Marseille
 
-### Southern Europe / Mediterranean (16)
-Rome, Milan, Naples, Venice, Florence, Madrid, Barcelona, Seville, Valencia, Lisbon, Porto, Athens, Thessaloniki, Istanbul, Ankara, Dubrovnik
+### Southern Europe / Mediterranean (25)
+Rome, Milan, Turin, Palermo, Naples, Venice, Florence, Madrid, Barcelona, Bilbao, Málaga, Seville, Valencia, Lisbon, Porto, Athens, Thessaloniki, Istanbul, Ankara, Dubrovnik, Split, Tirana, Valletta, Nicosia
 
-### Northern Europe (8)
-Stockholm, Oslo, Copenhagen, Helsinki, Reykjavik, Tallinn, Vilnius, Riga
+### Northern Europe (14)
+Stockholm, Gothenburg, Malmö, Oslo, Bergen, Copenhagen, Aarhus, Helsinki, Tampere, Turku, Reykjavik, Tallinn, Vilnius, Riga
 
-### Eastern Europe (15)
-Moscow, St. Petersburg, Novosibirsk, Yekaterinburg, Irkutsk, Vladivostok, Sochi, Warsaw, Kraków, Budapest, Prague, Bucharest, Belgrade, Zagreb, Sofia, Kyiv, Minsk, Tbilisi, Baku
+### Eastern Europe (31)
+Moscow, St. Petersburg, Novosibirsk, Yekaterinburg, Irkutsk, Vladivostok, Sochi, Warsaw, Kraków, Budapest, Prague, Bucharest, Cluj-Napoca, Belgrade, Zagreb, Sofia, Bratislava, Sarajevo, Skopje, Podgorica, Kyiv, Lviv, Odesa, Kharkiv, Minsk, Tbilisi, Yerevan, Baku, Chisinau
 
-### North Africa (9)
-Cairo, Alexandria, Casablanca, Marrakech, Fez, Tunis, Algiers, Tripoli, Khartoum
+### North Africa (13)
+Cairo, Alexandria, Luxor, Aswan, Casablanca, Rabat, Marrakech, Fez, Tunis, Algiers, Tripoli, Benghazi, Khartoum
 
-### West Africa (15)
-Lagos, Abuja, Kano, Accra, Kumasi, Dakar, Bamako, Ouagadougou, Abidjan, Douala, Conakry, Freetown, Lomé, Cotonou, Niamey
+### West Africa (19)
+Lagos, Abuja, Kano, Port Harcourt, Ibadan, Accra, Kumasi, Dakar, Bamako, Ouagadougou, Abidjan, Douala, Conakry, Freetown, Monrovia, Banjul, Lomé, Cotonou, Niamey
 
-### Central Africa (6)
-Kinshasa, Brazzaville, Bangui, Libreville, Yaoundé, Malabo
+### Central Africa (10)
+Kinshasa, Lubumbashi, Kisangani, Brazzaville, Bangui, Libreville, Yaoundé, Malabo, N'Djamena, Juba
 
-### East Africa (10)
-Nairobi, Mombasa, Addis Ababa, Asmara, Dar es Salaam, Zanzibar, Kampala, Kigali, Mogadishu, Djibouti
+### East Africa (16)
+Nairobi, Mombasa, Kisumu, Entebbe, Addis Ababa, Dire Dawa, Asmara, Dar es Salaam, Mwanza, Dodoma, Zanzibar, Kampala, Kigali, Mogadishu, Hargeisa, Djibouti
 
-### Southern Africa (10)
-Cape Town, Johannesburg, Durban, Harare, Lusaka, Maputo, Windhoek, Gaborone, Antananarivo, Lilongwe
+### Southern Africa (18)
+Cape Town, Johannesburg, Pretoria, Port Elizabeth, Durban, Harare, Bulawayo, Lusaka, Maputo, Beira, Luanda, Windhoek, Gaborone, Antananarivo, Lilongwe, Blantyre, Maseru, Mbabane
 
-### Middle East (16)
-Dubai, Abu Dhabi, Riyadh, Mecca, Jeddah, Tehran, Isfahan, Jerusalem, Tel Aviv, Beirut, Baghdad, Doha, Muscat, Amman, Kuwait City, Sanaa
+### Middle East (22)
+Dubai, Abu Dhabi, Riyadh, Mecca, Medina, Jeddah, Tehran, Mashhad, Shiraz, Isfahan, Jerusalem, Tel Aviv, Beirut, Baghdad, Basra, Erbil, Doha, Muscat, Amman, Kuwait City, Sanaa, Aleppo
 
-### South Asia (17)
-Mumbai, Delhi, Bangalore, Chennai, Kolkata, Hyderabad, Pune, Jaipur, Varanasi, Goa, Ahmedabad, Karachi, Lahore, Islamabad, Dhaka, Colombo, Kathmandu
+### South Asia (29)
+Mumbai, Delhi, Bangalore, Chennai, Kolkata, Hyderabad, Pune, Jaipur, Varanasi, Goa, Ahmedabad, Surat, Lucknow, Nagpur, Patna, Bhopal, Visakhapatnam, Chandigarh, Kochi, Karachi, Lahore, Islamabad, Peshawar, Dhaka, Chittagong, Colombo, Kathmandu
 
-### Central Asia (8)
-Tashkent, Samarkand, Almaty, Nur-Sultan, Bishkek, Ashgabat, Dushanbe, Kabul
+### Central Asia (10)
+Tashkent, Samarkand, Bukhara, Almaty, Nur-Sultan, Shymkent, Bishkek, Ashgabat, Dushanbe, Kabul
 
-### East Asia (18)
-Tokyo, Osaka, Kyoto, Fukuoka, Sapporo, Beijing, Shanghai, Guangzhou, Chengdu, Xi'an, Nanjing, Wuhan, Chongqing, Hong Kong, Seoul, Busan, Taipei, Ulaanbaatar
+### East Asia (31)
+Tokyo, Osaka, Kyoto, Nagoya, Hiroshima, Sendai, Fukuoka, Sapporo, Beijing, Shanghai, Shenzhen, Guangzhou, Tianjin, Chengdu, Harbin, Dalian, Kunming, Lanzhou, Nanchang, Xi'an, Nanjing, Wuhan, Chongqing, Hong Kong, Seoul, Busan, Incheon, Taipei, Ulaanbaatar
 
-### Southeast Asia (17)
-Singapore, Bangkok, Chiang Mai, Kuala Lumpur, Penang, Jakarta, Bali, Surabaya, Medan, Manila, Cebu, Hanoi, Ho Chi Minh City, Da Nang, Yangon, Phnom Penh, Vientiane
+### Southeast Asia (27)
+Singapore, Bangkok, Chiang Mai, Phuket, Kuala Lumpur, Penang, Kota Kinabalu, Jakarta, Bali, Bandung, Yogyakarta, Makassar, Surabaya, Medan, Manila, Cebu, Davao, Hanoi, Ho Chi Minh City, Da Nang, Nha Trang, Yangon, Mandalay, Phnom Penh, Siem Reap, Vientiane, Bandar Seri Begawan
 
-### Oceania (13)
-Sydney, Melbourne, Brisbane, Perth, Darwin, Adelaide, Auckland, Christchurch, Wellington, Suva, Port Moresby, Port Vila, Honiara
+### Oceania (22)
+Sydney, Melbourne, Brisbane, Gold Coast, Perth, Darwin, Adelaide, Canberra, Hobart, Cairns, Townsville, Launceston, Auckland, Christchurch, Queenstown, Wellington, Suva, Nadi, Port Moresby, Port Vila, Honiara, Noumea
 
 ---
 
@@ -78,4 +78,4 @@ Afghanistan, Albania, Algeria, American Samoa, Andorra, Angola, Antarctica, Arge
 
 ---
 
-_Last updated: 2026-03-01 — 257 cities across 18 regions. Add new cities to `cityData.ts` only; run `npm run build` to verify after each batch._
+_Last updated: 2026-03-01 — 400 cities across 18 regions. Add new cities to `cityData.ts` only; run `npm run build` to verify after each batch._
