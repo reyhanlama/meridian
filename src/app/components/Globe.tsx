@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { COUNTRY_NAMES, CITIES, getMusicalRegion, getWaterBodyName } from "./countryData";
+import { COUNTRY_NAMES, getMusicalRegion, getWaterBodyName } from "./countryData";
+import { CITIES } from "./cityData";
 
 const PIN_COLORS = ["#ff6b35", "#4ecdc4", "#ffe66d", "#c77dff", "#f7c59f", "#56cfe1", "#e77377", "#80ed99"];
 const MAX_CITY_DIST_RAD = 4.5 * (Math.PI / 180); // ~500 km — snaps to nearest major city
