@@ -29,8 +29,8 @@ function getContinent(region: string): string {
   const r = region.toLowerCase();
   if (r.includes("africa")) return "Africa";
   if (r.includes("europe")) return "Europe";
-  if (r.includes("north america") || r.includes("caribbean")) return "North America";
-  if (r.includes("south america") || r.includes("latin")) return "South America";
+  if (r.includes("north america") || r.includes("central america")) return "North America";
+  if (r.includes("south america")) return "South America";
   if (r.includes("asia") || r.includes("middle east")) return "Asia";
   if (r.includes("oceania")) return "Oceania";
   return "the unknown";
