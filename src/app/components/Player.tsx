@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion } from "motion/react";
-import { Download } from "lucide-react";
+import { Download, Link } from "lucide-react";
 import type { GlobePin } from "./Globe";
 import type { AudioEngine } from "./AudioEngine";
 import { getRegionLabel } from "./AudioEngine";
@@ -18,6 +18,7 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
   const [isHoveringBar, setIsHoveringBar] = useState(false);
   const [hoverPct, setHoverPct] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const animRef = useRef<number>(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -231,6 +232,21 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
   const handleReset = () => {
     audioEngine.stop();
     onReset();
+  };
+
+  const handleCopyLink = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+      }
+    } catch {
+      // user cancelled share or clipboard unavailable
+    }
   };
 
   const formatTime = (pct: number) => {
@@ -527,6 +543,17 @@ export function Player({ pins, audioEngine, onReset }: PlayerProps) {
         >
           <Download size={13} strokeWidth={1.5} />
           Download
+        </button>
+
+        <button
+          onClick={handleCopyLink}
+          className="flex items-center gap-2 px-5 py-3 cursor-pointer"
+          style={btnBase}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+        >
+          <Link size={13} strokeWidth={1.5} />
+          {linkCopied ? "Copied!" : "Share"}
         </button>
 
         <button

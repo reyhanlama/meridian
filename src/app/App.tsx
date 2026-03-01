@@ -8,6 +8,9 @@ import { Tracklist } from "./components/Tracklist";
 import { Interstitial } from "./components/Interstitial";
 import { Player } from "./components/Player";
 import { AudioEngine } from "./components/AudioEngine";
+import { encodePins, decodePins } from "./components/shareUtils";
+
+const PIN_COLORS = ["#ff6b35", "#4ecdc4", "#ffe66d", "#c77dff", "#f7c59f", "#56cfe1", "#e77377", "#80ed99"];
 
 type Phase = "map" | "loading" | "player";
 
@@ -24,6 +27,29 @@ export default function App() {
       audioEngineRef.current.dispose();
     };
   }, []);
+
+  // Restore pins from URL hash on first load
+  useEffect(() => {
+    const decoded = decodePins(window.location.hash);
+    if (decoded.length === 0) return;
+    const restored: GlobePin[] = decoded.slice(0, MAX_PINS).map((p, i) => ({
+      ...p,
+      id: i + 1,
+      color: PIN_COLORS[i % PIN_COLORS.length],
+    }));
+    pinIdCounter.current = restored.length;
+    setPins(restored);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep URL hash in sync with current pins
+  useEffect(() => {
+    const encoded = encodePins(pins);
+    if (encoded) {
+      history.replaceState(null, "", "#" + encoded);
+    } else {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, [pins]);
 
   const handlePinDrop = useCallback((pin: GlobePin) => {
     pinIdCounter.current += 1;
