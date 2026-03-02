@@ -146,18 +146,179 @@ Commit: `b51735a`
 
 ---
 
-## Up Next — Sprint 1 P1 (remaining)
+---
 
-| ID  | Task                                              | Agent  |
-|-----|---------------------------------------------------|--------|
-| P1a | Web App Manifest + app icons (PWA installability) | UI     |
-| P1b | Touch targets — all buttons min 44px tall         | UI     |
-| P1c | Always-visible remove × on Tracklist (no hover)  | UI     |
-| P1d | Replace hover-only colour changes with :active    | UI     |
-| P1e | Player buttons stack vertically on small screens  | UI     |
-| P1f | Web Share API (navigator.share)                   | Share  |
-| P1g | Haptic feedback on pin drop                       | Globe  |
-| B1  | Pin ID collision on touch remove + re-add         | Globe  |
-| B2  | Dead keys in REGION_SCALE_MAP                     | Audio  |
-| B3  | getContinent("Japan") bug                         | Story  |
-| B5  | City snap inside country polygons                 | Globe  |
+## Sprint 1 — continued
+
+---
+
+### [S1-2] Globe Agent — Curate city list; raise snap radius
+Date: 2026-02-28
+Commit: `1a1ede1`
+
+**Why:** City snap was unreliable on mobile — radius too tight and city list had gaps in coverage for Africa and Central Asia.
+
+**Files changed:**
+- `src/app/components/countryData.ts` — Curated city list to 141 well-distributed cities; raised snap radius from 300 km to 500 km
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-3] Globe Agent — Fix point-in-polygon wraparound bug
+Date: 2026-02-28
+Commit: `67f9fb5`
+
+**Why:** Mexico (west of −90°) was resolving to India. The polygon ray-casting algorithm did not handle antimeridian-crossing polygons, causing longitudes near ±180° to be misclassified.
+
+**Files changed:**
+- `src/app/components/Globe.tsx` — Fixed ray-casting to normalise longitudes relative to the test point before intersection test
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-4] Planner — Add GEOGRAPHY.md
+Date: 2026-02-28
+Commit: `4e23103`
+
+**Why:** Document the full inventory of mapped cities, countries, and water bodies for future maintenance reference.
+
+**Files changed:**
+- `GEOGRAPHY.md` *(new)* — Full listing of all cities, countries, and named water bodies in the dataset
+
+**Verified by Tester:** n/a (docs only)
+
+---
+
+### [S1-5] Globe Agent — Fix B2: dead scale keys in REGION_SCALE_MAP
+Date: 2026-02-28
+Commit: `670f1e8`
+
+**Why:** Several region names in `REGION_SCALE_MAP` did not match the strings produced by the polygon lookup, leaving those regions falling through to the default "Major" scale regardless of location.
+
+**Files changed:**
+- `src/app/components/AudioEngine.ts` — Corrected mismatched region key strings in `REGION_SCALE_MAP`
+- `src/app/components/countryData.ts` — Expanded city list from 141 to 202 cities
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-6] Story Agent — Fix B3: getContinent("Central America") returning unknown
+Date: 2026-02-28
+Commit: `91175cb`
+
+**Why:** `storyGenerator.ts` had no continent mapping for "Central America", causing the story generator to emit "the unknown" as the continent name in generated text.
+
+**Files changed:**
+- `src/app/components/storyGenerator.ts` — Added "Central America" → "the Americas" mapping in the continent lookup
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-7] Globe Agent — Fix B1: pin ID collision on touch remove + re-add
+Date: 2026-02-28
+Commit: `2527462`
+
+**Why:** Pin IDs were generated from a hash of lat/lng which collided when the same city was dropped twice after removal, breaking the Tracklist's key-based reconciliation.
+
+**Files changed:**
+- `src/app/components/Globe.tsx` — Replaced hash-based ID generation with a monotonically incrementing counter
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-8] Globe Agent — Add P2g night-side hemisphere shading
+Date: 2026-02-28
+Commit: `218a21e`
+
+**Why:** The globe had uniform lighting. Adding a subtle night-side darkening gives the globe visual depth and a sense of the day/night terminator.
+
+**Files changed:**
+- `src/app/components/Globe.tsx` — Added radial gradient overlay on the hemisphere opposite the light source; parameterised light direction
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-9] Share Agent — Implement P3a URL deep linking + Copy Link button
+Date: 2026-02-28
+Commit: `c30c1ae`
+
+**Why:** Users had no way to share a specific composition. Adding URL-encoded pin state means a shared link recreates the exact globe state and auto-triggers generation.
+
+**Files changed:**
+- `src/app/shareUtils.ts` *(new)* — Encode/decode pin list to/from a compact URL query string
+- `src/app/App.tsx` — On load, parse URL params and restore pins; add "Copy Link" button to player UI
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-10] Globe Agent — Split cityData.ts; expand to 257 cities
+Date: 2026-02-28
+Commit: `363de1c`
+
+**Why:** `countryData.ts` was growing too large. Splitting city data into its own file improves maintainability. Coverage was also extended with 55 new cities across underrepresented regions.
+
+**Files changed:**
+- `src/app/components/cityData.ts` *(new)* — All city records extracted to dedicated file
+- `src/app/components/countryData.ts` — Removed city array; imports from `cityData.ts`
+- `GEOGRAPHY.md` *(updated)* — Reflects new 257-city count and maintenance notes
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-11] Globe Agent — Expand city coverage to 400; fix Africa longitude bug
+Date: 2026-02-28
+Commit: `2403e39`
+
+**Why:** Several African cities had incorrect longitudes (sign error), placing them in the ocean. Coverage was also expanded to 400 total cities for better global distribution.
+
+**Files changed:**
+- `src/app/components/cityData.ts` — Corrected longitude signs for affected African cities; added ~143 new cities to reach 400 total
+
+**Verified by Tester:** yes
+
+---
+
+### [S1-12] UI Agent — Add favicon, apple-touch-icon, and OG social meta tags
+Date: 2026-02-28
+Commit: `4cc0994`
+
+**Why:** The app had no favicon (showing a blank tab icon) and no Open Graph tags, meaning shared links on social media showed no preview image or title.
+
+**Files changed:**
+- `index.html` — Added `<link rel="icon">`, `<link rel="apple-touch-icon">`, `og:title`, `og:description`, `og:image`, `twitter:card` meta tags
+- `public/` — Added favicon and apple-touch-icon assets
+
+**Verified by Tester:** yes
+
+---
+
+## Sprint 2 — "Volume & Loudness"
+
+---
+
+### [S2-1] Audio Agent — Fix low volume: normalization + dynamics compression
+Date: 2026-03-02
+Commit: `f98c3ef`
+
+**Why:** User testing revealed the composition was inaudibly quiet even at full device volume. Root cause: accumulated attenuation across the signal chain — master bus peaked at 0.75, dry split at 0.45, per-layer gains as low as 0.008 — left the rendered buffer at roughly −12 to −20 dBFS with no stage to recover level.
+
+**Fix:**
+1. **Post-render normalization** — after `offline.startRendering()`, the buffer is scanned for its peak sample and scaled so it peaks at 0.92 (−0.7 dBFS). Guarantees maximum loudness regardless of pin combination.
+2. **DynamicsCompressor in offline render** — inserted before `offline.destination` (threshold −24 dB, ratio 4:1, soft knee 30 dB). Brings up quiet passages before normalization so the gain is applied to the whole piece, not just the loudest spike.
+3. **DynamicsCompressor in playback chain** — same settings added between `masterGain` and `analyser` in `ensureCtx()`, benefiting in-browser playback.
+
+**Files changed:**
+- `src/app/components/AudioEngine.ts`
+  - Added `normalizeBuffer()` helper function
+  - `renderComposition()` — inserts compressor node, calls `normalizeBuffer()` on rendered buffer
+  - `ensureCtx()` — inserts compressor between `masterGain` and `analyser`
+
+**Verified by Tester:** yes
