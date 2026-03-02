@@ -696,6 +696,27 @@ function scheduleHarmonicGhosts(
   }
 }
 
+// --- Post-render normalization ---
+
+function normalizeBuffer(buffer: AudioBuffer, targetPeak: number = 0.92): void {
+  let peak = 0;
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < data.length; i++) {
+      const abs = Math.abs(data[i]);
+      if (abs > peak) peak = abs;
+    }
+  }
+  if (peak < 0.001) return;
+  const gain = targetPeak / peak;
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < data.length; i++) {
+      data[i] *= gain;
+    }
+  }
+}
+
 // --- WAV encoder ---
 function encodeWAV(buffer: AudioBuffer): Blob {
   const numChannels = buffer.numberOfChannels;
@@ -764,10 +785,17 @@ export class AudioEngine {
       this.ctx = new AudioContext();
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.value = 1;
+      const compressor = this.ctx.createDynamicsCompressor();
+      compressor.threshold.value = -24;
+      compressor.knee.value = 30;
+      compressor.ratio.value = 4;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.25;
       this.analyser = this.ctx.createAnalyser();
       this.analyser.fftSize = 256;
       this.analyser.smoothingTimeConstant = 0.75;
-      this.masterGain.connect(this.analyser);
+      this.masterGain.connect(compressor);
+      compressor.connect(this.analyser);
       this.analyser.connect(this.ctx.destination);
     }
     if (this.ctx.state === "suspended") {
@@ -858,8 +886,16 @@ export class AudioEngine {
   async renderComposition(regions: string[]): Promise<void> {
     const sampleRate = 44100;
     const offline = new OfflineAudioContext(2, sampleRate * this.duration, sampleRate);
-    scheduleComposition(offline, offline.destination, regions, 0, this.duration);
+    const compressor = offline.createDynamicsCompressor();
+    compressor.threshold.value = -24;
+    compressor.knee.value = 30;
+    compressor.ratio.value = 4;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.25;
+    compressor.connect(offline.destination);
+    scheduleComposition(offline, compressor, regions, 0, this.duration);
     this.renderedBuffer = await offline.startRendering();
+    normalizeBuffer(this.renderedBuffer);
     this.ensureCtx();
   }
 
